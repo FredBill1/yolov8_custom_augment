@@ -16,6 +16,7 @@ from .augment import Compose, Format, Instances, LetterBox, classify_albumentati
 from .base import BaseDataset
 from .utils import HELP_URL, LOGGER, get_hash, img2label_paths, verify_image_label
 
+from .generate_scratch.GenerateScratch import GenerateScratch
 
 class YOLODataset(BaseDataset):
     """
@@ -139,7 +140,8 @@ class YOLODataset(BaseDataset):
             for lb in labels:
                 lb['segments'] = []
         if len_cls == 0:
-            raise ValueError(f'All labels empty in {cache_path}, can not start training without labels. {HELP_URL}')
+            # raise ValueError(f'All labels empty in {cache_path}, can not start training without labels. {HELP_URL}')
+            LOGGER.warning(f'WARNING ⚠️ All labels empty in {cache_path}, can not start training without labels. {HELP_URL}')
         return labels
 
     # TODO: use hyp config to set all these augmentations
@@ -177,8 +179,8 @@ class YOLODataset(BaseDataset):
         keypoints = label.pop('keypoints', None)
         bbox_format = label.pop('bbox_format')
         normalized = label.pop('normalized')
-        label['instances'] = Instances(bboxes, segments, keypoints, bbox_format=bbox_format, normalized=normalized)
-        return label
+        # label['instances'] = Instances(bboxes, segments, keypoints, bbox_format=bbox_format, normalized=normalized)
+        return GenerateScratch(label)
 
     @staticmethod
     def collate_fn(batch):
